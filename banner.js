@@ -1,35 +1,27 @@
 const CONFIG = {
     enabled: true,
-    domain: 'ab-peptides.com',
-    id: '257011716',
-    licenseKey: '6C5A-F923-D1B2-XY91'
+    domains: [
+        "ab-peptides.com",
+        "www.ab-peptides.com"
+    ],
+    licenseKey: "6C5A-F923-D1B2-XY91"
 };
 
 let authenticated = true;
 
+// Enabled
 if (!CONFIG.enabled) {
     authenticated = false;
 }
 
-if (window.location.hostname !== CONFIG.domain) {
+// Domain
+if (!CONFIG.domains.includes(window.location.hostname)) {
     authenticated = false;
 }
 
-try {
-    const authId = Object.keys(window.google_tag_manager?.r?.container || {});
-
-    if (!authId.includes(CONFIG.id)) {
-        authenticated = false;
-    }
-} catch (e) {
-    authenticated = false;
-}
-
-// Stop execution
 if (!authenticated) {
     throw new Error("Authentication failed.");
 }
-
 
 //European countries
 

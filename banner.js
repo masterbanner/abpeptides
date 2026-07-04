@@ -3907,11 +3907,20 @@ function setupEventListeners() {
 
 // Show/hide functions with animations
 function showCookieBanner() {
+
     const banner = document.getElementById('cookieConsentBanner');
+
+    if (!banner) {
+        console.warn('Banner not found.');
+        return;
+    }
+
     banner.style.display = 'block';
-    setTimeout(() => {
+
+    requestAnimationFrame(() => {
         banner.classList.add('show');
-    }, 10);
+    });
+
     bannerShown = true;
 }
 

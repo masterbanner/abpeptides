@@ -2068,9 +2068,15 @@ function generatePasswordPrompt(language = 'en') {
 // Replace the existing checkGeoTargeting function with this:
 function checkGeoTargeting(geoData) {
     // If we don't have country data, allow by default (or deny if you prefer)
-    if (!geoData || !geoData.country || geoData.country === 'Not found') {
-        return !config.geoConfig.euOnly; // If EU-only mode, deny unknown locations
-    }
+   const invalidCountry =
+    !geoData ||
+    !geoData.country ||
+    geoData.country === "Unknown" ||
+    geoData.country === "Not found";
+
+if (invalidCountry) {
+    return true;
+}
 
     // Check blocked locations first (highest priority)
     if (config.geoConfig.blockedCountries.length > 0 && 

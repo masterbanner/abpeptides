@@ -4506,12 +4506,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Fetch location data asynchronously
     await fetchLocationData();
-    
-      // Check geo-targeting before proceeding
-    const geoAllowed = checkGeoTargeting(locationData);
-    if (!geoAllowed) {
-        return;
-    }
 
     // Scan and categorize existing cookies
     const detectedCookies = scanAndCategorizeCookies();

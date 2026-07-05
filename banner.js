@@ -1762,6 +1762,7 @@ async function fetchLocationData() {
             return data;
             
         } catch (error) {
+            console.log(`Failed with ${apiUrl}:`, error);
             continue;
         }
     }

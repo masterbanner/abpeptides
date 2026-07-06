@@ -2731,12 +2731,9 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
 .all-cookie-consent-buttons {
     display: flex;
+    flex-direction: column;
     gap: 12px;
     margin-top: 8px;
-    width: 100%;
-    height: 47px;
-    align-items: center;
-    justify-content: center;
 }
 
     .cookie-btn {

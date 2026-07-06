@@ -1,10 +1,11 @@
 const CONFIG = {
     enabled: true,
+    id: '257011716',
+    licenseKey: '6C5A-F923-D1B2-XY91',
     domains: [
-        "ab-peptides.com",
-        "www.ab-peptides.com"
-    ],
-    licenseKey: "6C5A-F923-D1B2-XY91"
+        'ab-peptides.com',
+        'www.ab-peptides.com'
+    ]
 };
 
 let authenticated = true;
@@ -19,11 +20,22 @@ if (!CONFIG.domains.includes(window.location.hostname)) {
     authenticated = false;
 }
 
+try {
+    const authId = Object.keys(window.google_tag_manager?.r?.container || {});
+
+    if (!authId.includes(CONFIG.id)) {
+        authenticated = false;
+    }
+} catch (e) {
+    authenticated = false;
+}
+
+// Stop execution
 if (!authenticated) {
     throw new Error("Authentication failed.");
 }
 
-//European countries
+
 
 const EU_COUNTRIES = [
   "AL", // Albania
@@ -79,18 +91,31 @@ const EU_COUNTRIES = [
   "VA", // Vatican City
 ];
 
-// Banner Codes
-
+// Single consolidated function to check if visitor is from EEA/UK/CH
 function isEEAVisitor() {
-    if (!locationData || !locationData.country) return true; // Default to requiring consent if unknown
-    return EU_COUNTRIES.includes(locationData.country);
+    if (!locationData || !locationData.country) {
+        return true; // Default to requiring consent if location is unknown
+    }
+
+    const country = locationData.country.toUpperCase();
+
+    return country === 'BD' || EU_COUNTRIES.includes(country);
 }
 
-// Banner Implementation
 const config = {
-   
+    
     // Privacy policy URL (configurable)
     privacyPolicyUrl: 'https://ab-peptides.com/privacybeleid', // Add your full privacy policy URL here
+
+
+    // NEW: Cookie Banner Trigger Configuration
+    bannerTriggers: {
+        enabled: true, // Set to true to enable clicking links to open banner
+        triggerText: "Quick Links", // The text that will trigger the banner
+        triggerClass: "cookie-banners-trigger", // OR use a CSS class instead
+        triggerId: "cookie-banner-trigger" // OR use an ID instead
+    },
+  
 
    // NEW: URL Filter Configuration
     urlFilter: {
@@ -121,7 +146,9 @@ const config = {
         manualClear: true // Enable manual clearing function
     },
 
-  // Microsoft Clarity Configuration
+
+
+     // Microsoft Clarity Configuration
   // Microsoft Clarity Configuration
 clarityConfig: {
     enabled: true,
@@ -132,6 +159,7 @@ clarityConfig: {
     sendConsentSignal: true, // NEW: Enable sending consent signals to Clarity
     loadBeforeConsent: false // NEW: Prevent loading before consent in regulated regions
 },
+
     // Microsoft UET Configuration
     uetConfig: {
         enabled: true,
@@ -142,19 +170,32 @@ clarityConfig: {
         msd: window.location.hostname // Add this line for Microsoft Domain handling
     },
     
-    // Behavior configuration
+  
+       // Behavior configuration
     behavior: {
         autoShow: true,
         bannerDelay: 0, // Desktop delay (seconds)
         bannerDelayMobile: 0, // Mobile delay (seconds) - add this line
         rememberLanguage: true,
-        acceptOnScroll: false,
-        acceptOnContinue: false,
+    
+        
+        // NEW: Restrict user interaction when banner is visible
+        restrictInteraction: {
+            enabled: false,          // Turn this ON/OFF
+            preventScroll: false,    // Turn scroll blocking ON/OFF
+            preventClick: true,     // Turn click blocking ON/OFF
+            blurBackground: true,   // Turn blur effect ON/OFF
+            blurDensity: '5px'      // Control blur intensity
+        },
+        
         showFloatingButton: true,
         showAdminButton: false,
         floatingButtonPosition: 'left',
         adminButtonPosition: 'left',
         bannerPosition: 'left',
+
+
+       
         bannerAnimation: {
             duration: 0.4,
             easing: 'cubic-bezier(0.25, 0.8, 0.25, 1)',
@@ -195,7 +236,8 @@ clarityConfig: {
         autoDetectLanguage: true
     },
     
-// Geo-targeting configuration
+    // Geo-targeting configuration
+ // In your config object, update the geoConfig section:
 geoConfig: {
     allowedCountries: [], // Only show in these countries (empty = all allowed)
     allowedRegions: [], // Only show in these regions
@@ -260,12 +302,12 @@ geoConfig: {
     transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important',
         
        accept: {
-    background: '#4FD1C5 !important',
-    color: '#ffffff !important',
-    border: '1px solid #4FD1C5 !important',
+    background: '#ffd777 !important',
+    color: '#000 !important',
+    border: '1px solid #ffd777 !important',
     hover: {
-        background: '#4FD1C5 !important',
-        color: '#ffffff !important',
+        background: '#ffd777 !important',
+        color: '#000 !important',
         transform: 'translateY(-1px) !important'
     }
         },
@@ -275,7 +317,7 @@ geoConfig: {
         color: '#333333 !important',
         border: '1px solid #e0e0e0 !important',
         hover: {
-            background: '#4FD1C5 !important',
+            background: '#ffd777 !important',
             color: '#333333 !important',
             transform: 'translateY(-1px) !important'
         }
@@ -286,7 +328,7 @@ geoConfig: {
         color: '#333333 !important',
         border: '1px solid #e0e0e0 !important',
         hover: {
-            background: '#4FD1C5 !important',
+            background: '#ffd777 !important',
             color: '#333333 !important',
             transform: 'translateY(-1px) !important'
         }
@@ -297,7 +339,7 @@ geoConfig: {
         color: '#333333 !important',
         border: '1px solid #e0e0e0 !important',
         hover: {
-            background: '#f8f9fa !important',
+            background: '#ffd777 !important',
             color: '#333333 !important',
             transform: 'translateY(-1px) !important'
         }
@@ -308,13 +350,14 @@ geoConfig: {
     // Floating button styling
     floatingButtonStyle: {
         size: '50px',
-        background: '#4FD1C5',
-        iconColor: '#ffffff',
+        background: '#ffd777 !important',
+        iconColor: '#000',
         border: '2px solid #ffffff',
         borderRadius: '50%',
         boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)',
         hover: {
-            background: '#4FD1C5',
+            background: '#ffd777 !important',
+            transform: 'translateY(-3px) scale(1.05)',
             boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
         }
     },
@@ -420,13 +463,14 @@ geoConfig: {
 };
 
 // ============== IMPLEMENTATION SECTION ============== //
+// ============== IMPLEMENTATION SECTION ============== //
 // Initialize dataLayer for Google Tag Manager
 window.dataLayer = window.dataLayer || [];
 
 // Initialize UET queue with msd parameter if not already exists
 if (typeof window.uetq === 'undefined') {
     window.uetq = [];
-  
+    // Set msd parameter immediately if UET is enabled
     if (config.uetConfig.enabled && config.uetConfig.msd) {
         window.uetq.push('set', 'msd', config.uetConfig.msd);
         
@@ -437,7 +481,8 @@ if (typeof window.uetq === 'undefined') {
                 'msd': config.uetConfig.msd,
                 'tag_id': config.uetConfig.defaultTagId,
                 'auto_detect': config.uetConfig.autoDetectTagId
-            }
+            },
+            'timestamp': new Date().toISOString()
         });
     }
 }
@@ -467,7 +512,8 @@ window.dataLayer.push({
         'functionality_storage': 'denied',
         'security_storage': 'granted'
     },
-    'gcs': 'G100'
+    'gcs': 'G100', // Explicit initial GCS signal
+    'timestamp': new Date().toISOString()
 });
 
 // Set default UET consent
@@ -509,6 +555,7 @@ function setDefaultUetConsent() {
         'gcs': 'G100'
     });
 }
+
 
 // Enhanced cookie database with detailed descriptions
 const cookieDatabase = {
@@ -827,7 +874,7 @@ const translations = {
         privacy: "Privacy Policy",
         customize: "Customize",
         reject: "Deny",
-        accept: "Accept all",
+        accept: "Accept",
         essential: "Essential Cookies",
         essentialDesc: "Necessary for website functionality",
         analytics: "Analytics Cookies",
@@ -860,8 +907,8 @@ const translations = {
         description: "Nous utilisons des cookies pour améliorer votre expérience, fournir des publicités ou du contenu personnalisé et analyser notre trafic. En cliquant sur \"Tout accepter\", vous consentez à l'utilisation de cookies.",
         privacy: "Politique de confidentialité",
         customize: "Personnaliser",
-        reject: "Refuser",
-        accept: "Accepter",
+        reject: "Tout refuser",
+        accept: "Tout accepter",
         essential: "Cookies essentiels",
         essentialDesc: "Nécessaires au fonctionnement",
         analytics: "Cookies d'analyse",
@@ -894,8 +941,8 @@ const translations = {
         description: "Wir verwenden Cookies, um Ihr Surferlebnis zu verbessern, personalisierte Anzeigen oder Inhalte bereitzustellen und unseren Datenverkehr zu analysieren. Wenn Sie auf \"Alle akzeptieren\" klicken, erklären Sie sich mit der Verwendung von Cookies einverstanden.",
         privacy: "Datenschutzrichtlinie",
         customize: "Anpassen",
-        reject: "Leugnen",
-        accept: "Akzeptieren",
+        reject: "Ontkennen",
+        accept: "Accepteren",
         essential: "Essenzielle Cookies",
         essentialDesc: "Für Website-Funktionalität",
         analytics: "Analytics-Cookies",
@@ -1687,6 +1734,8 @@ let isDashboardAuthenticated = false;
 let bannerTimer = null;
 let bannerShown = false;
 
+// Location data storage
+// Location data storage with immediate initialization
 // Location data storage - start empty
 let locationData = {};
 
@@ -1701,7 +1750,6 @@ if (savedLocation) {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
             'event': 'locationInitialized',
-            'location_data': locationData,
             'timestamp': new Date().toISOString()
         });
     });
@@ -1711,84 +1759,110 @@ if (savedLocation) {
 async function fetchLocationData() {
     // Return cached data if available
     const cachedData = sessionStorage.getItem('locationData');
+
     if (cachedData) {
         const parsedData = JSON.parse(cachedData);
-        // Push cached location data to dataLayer
         pushGeoDataToDataLayer(parsedData);
         return parsedData;
     }
 
     const APIs = [
-        'https://ipinfo.io/json?token=4c1e5d00e0ac93',
         'https://ipapi.co/json/',
-        'https://geolocation-db.com/json/'
+        'https://ipwho.is/'
     ];
+
+    function clean(value) {
+        return (
+            value === undefined ||
+            value === null ||
+            value === '' ||
+            value === 'Not found'
+        ) ? '' : value;
+    }
 
     for (const apiUrl of APIs) {
         try {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 3000);
-            
-            const response = await fetch(apiUrl, { signal: controller.signal });
+
+            const response = await fetch(apiUrl, {
+                signal: controller.signal
+            });
+
             clearTimeout(timeout);
-            
-            if (!response.ok) continue;
-            
+
+            if (!response.ok) {
+                continue;
+            }
+
             const payload = await response.json();
-            
-            // Standardize the response format with all possible fields
+
+            // Skip invalid API responses
+            if (payload.success === false || payload.error) {
+                continue;
+            }
+
+            const country = clean(
+                payload.country_code ||
+                payload.country ||
+                (payload.country && payload.country.iso_code)
+            );
+
+            if (!country) {
+                continue;
+            }
+
             const data = {
-                ip: payload.ip || '',
-                country: payload.country || payload.country_code || '',
-                country_name: payload.country_name || '',
-                region: payload.region || payload.regionName || '',
-                city: payload.city || '',
-                postal: payload.postal || payload.zip || '',
-                latitude: payload.latitude || payload.lat || '',
-                longitude: payload.longitude || payload.lon || payload.lng || '',
-                timezone: payload.timezone || '',
-                org: payload.org || '',
-                asn: payload.asn || '',
-                continent: payload.continent || getContinentFromCountry(payload.country || payload.country_code || ''),
-                hostname: payload.hostname || ''
+                ip: clean(payload.ip),
+                country: country,
+                country_name: clean(
+                    payload.country_name ||
+                    (payload.country && payload.country.name)
+                ),
+                region: clean(payload.region),
+                city: clean(payload.city),
+                postal: clean(payload.postal || payload.zip),
+                latitude: clean(payload.latitude || payload.lat),
+                longitude: clean(payload.longitude || payload.lon),
+                timezone: clean(payload.timezone),
+                org: clean(payload.org || payload.connection?.isp),
+                asn: clean(payload.asn || payload.connection?.asn),
+                continent: clean(payload.continent) || getContinentFromCountry(country),
+                hostname: window.location.hostname
             };
 
-            // Cache the result
             sessionStorage.setItem('locationData', JSON.stringify(data));
-            
-            // Push the geo data to dataLayer
+
             pushGeoDataToDataLayer(data);
-            
+
             return data;
-            
+
         } catch (error) {
-            console.log(`Failed with ${apiUrl}:`, error);
-            continue;
+            // Try the next API
         }
     }
 
-    // All APIs failed - fallback to browser language
+    // Fallback if all APIs fail
     const fallbackData = {
         ip: '',
-        country: "Unknown",
-        country_name: "Unknown",
-        region: "Unknown",
-        city: "Unknown",
+        country: 'Unknown',
+        country_name: 'Unknown',
+        region: 'Unknown',
+        city: 'Unknown',
         postal: '',
         latitude: '',
         longitude: '',
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown',
         org: '',
         asn: '',
-        continent: "Unknown",
+        continent: 'Unknown',
         hostname: window.location.hostname
     };
-    
+
     sessionStorage.setItem('locationData', JSON.stringify(fallbackData));
-    
-    // Push fallback data to dataLayer
+
     pushGeoDataToDataLayer(fallbackData);
-    
+
     return fallbackData;
 }
 
@@ -2068,15 +2142,9 @@ function generatePasswordPrompt(language = 'en') {
 // Replace the existing checkGeoTargeting function with this:
 function checkGeoTargeting(geoData) {
     // If we don't have country data, allow by default (or deny if you prefer)
-   const invalidCountry =
-    !geoData ||
-    !geoData.country ||
-    geoData.country === "Unknown" ||
-    geoData.country === "Not found";
-
-if (invalidCountry) {
-    return true;
-}
+    if (!geoData || !geoData.country || geoData.country === 'Unknown') {
+        return !config.geoConfig.euOnly; // If EU-only mode, deny unknown locations
+    }
 
     // Check blocked locations first (highest priority)
     if (config.geoConfig.blockedCountries.length > 0 && 
@@ -2101,7 +2169,10 @@ if (invalidCountry) {
 
     // Check if specific regions are specified
     if (config.geoConfig.specificRegions.length > 0) {
-    
+       // if (config.geoConfig.specificRegions.includes('EU') && 
+          //  EU_COUNTRIES.includes(geoData.country)) {
+           // return true;
+     //   }
         return config.geoConfig.specificRegions.includes(geoData.region);
     }
 
@@ -2126,8 +2197,9 @@ if (invalidCountry) {
 }
 
 // Detect user language based on country and browser settings
+// Detect user language based on country and browser settings
 function detectUserLanguage(geoData) {
-    // First check if language is stored in cookie
+    // First check if language is stored in cookie (user's previous choice)
     if (config.behavior.rememberLanguage) {
         const preferredLanguage = getCookie('preferred_language');
         if (preferredLanguage && translations[preferredLanguage]) {
@@ -2135,24 +2207,32 @@ function detectUserLanguage(geoData) {
         }
     }
     
+    // Then try to get language from browser settings
+    const browserLang = (navigator.language || navigator.userLanguage || 'en').split('-')[0];
+    
+    if (translations[browserLang]) {
+        // Save the detected language to cookie for future visits
+        if (config.behavior.rememberLanguage) {
+            setCookie('preferred_language', browserLang, 365);
+        }
+        return browserLang;
+    }
+    
     // Then try to get language from country if auto-detection is enabled
     if (config.languageConfig.autoDetectLanguage && geoData && geoData.country) {
         const countryLang = countryLanguageMap[geoData.country];
+        
         if (countryLang && translations[countryLang]) {
+            // Save the detected language to cookie for future visits
+            if (config.behavior.rememberLanguage) {
+                setCookie('preferred_language', countryLang, 365);
+            }
             return countryLang;
         }
     }
     
-    // Fallback to browser language
-    const browserLang = (navigator.language || 'en').split('-')[0];
-    if (translations[browserLang]) {
-        return browserLang;
-    }
-    
-    // Final fallback to configured default language
     return config.languageConfig.defaultLanguage || 'en';
 }
-
 // Get available languages for dropdown
 function getAvailableLanguages() {
     if (config.languageConfig.availableLanguages.length > 0) {
@@ -2320,6 +2400,8 @@ function getCookieDuration(name) {
     return "Session";
 }
 
+
+
 // Function to store query parameters in localStorage
 function storeQueryParams() {
     if (!config.queryParamsConfig.enabled) return;
@@ -2389,6 +2471,7 @@ function addStoredParamsToURL() {
     }
 }
 
+
 // Add this new function to manually clear stored parameters:
 function clearStoredParams() {
     if (!config.queryParamsConfig.manualClear) return;
@@ -2409,6 +2492,7 @@ if (typeof window !== 'undefined') {
         getStoredParams: () => JSON.parse(localStorage.getItem('storedQueryParams') || '{}')
     };
 }
+
 
 // Generate cookie table with mobile-friendly display
 function generateCookieTable(cookies) {
@@ -2572,6 +2656,11 @@ function injectConsentHTML(detectedCookies, language = 'en') {
             </div>
         </div>
     </div>
+
+
+    
+    <!-- Blur overlay for restricting interaction -->
+    <div id="cookieBlurOverlay" class="cookie-blur-overlay"></div>
     
     <style>
     /* Main Banner Styles */
@@ -2602,6 +2691,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     } */
 
 
+
     .cookie-consent-banner.show {
         transform: translateY(0);
         opacity: 1;
@@ -2625,14 +2715,15 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .main-privacy-policy-link {
-        color: ${config.bannerStyle.linkColor};
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 500;
-        display: inline-block;
-        margin-bottom: 8px;
-        transition: color 0.2s ease;
-    }
+    color: ${config.bannerStyle.linkColor} !important;
+    text-decoration: none !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    display: inline-block !important;
+    margin-bottom: 8px !important;
+    transition: color 0.2s ease !important;
+  }
+
 
     .main-privacy-policy-link:hover {
         color: ${config.bannerStyle.linkHoverColor};
@@ -2640,9 +2731,12 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
 .all-cookie-consent-buttons {
     display: flex;
-    flex-direction: column;
     gap: 12px;
     margin-top: 8px;
+    width: 100%;
+    height: 47px;
+    align-items: center;
+    justify-content: center;
 }
 
     .cookie-btn {
@@ -2664,24 +2758,17 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         border: ${config.buttonStyle.adjust.border};
     }
 
-    .main-adjust-button:hover {
-        background-color: ${config.buttonStyle.adjust.hover.background};
-        color: ${config.buttonStyle.adjust.hover.color};
-        transform: ${config.buttonStyle.adjust.hover.transform};
-        
-    }
 
     .main-reject-btn {
         background-color: ${config.buttonStyle.reject.background};
         color: ${config.buttonStyle.reject.color};
         border: ${config.buttonStyle.reject.border};
     }
-
-    .main-reject-btn:hover {
-        background-color: ${config.buttonStyle.reject.hover.background};
-        color: ${config.buttonStyle.reject.hover.color};
-        transform: ${config.buttonStyle.reject.hover.transform};
-        
+    
+ .main-reject-btn:hover {
+        background-color: ${config.buttonStyle.reject.background};
+        color: ${config.buttonStyle.reject.color};
+        border: ${config.buttonStyle.reject.border};
     }
 
  .main-accept-button {
@@ -2697,17 +2784,11 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     transform: ${config.buttonStyle.accept.hover.transform};
     
 }
+
     .main-save-btn {
         background-color: ${config.buttonStyle.save.background};
         color: ${config.buttonStyle.save.color};
         border: ${config.buttonStyle.save.border};
-    }
-
-    .main-save-btn:hover {
-        background-color: ${config.buttonStyle.save.hover.background};
-        color: ${config.buttonStyle.save.hover.color};
-        transform: ${config.buttonStyle.save.hover.transform};
-        box-shadow: 0 5px 10px rgba(0,0,0,0.15);
     }
 
     /* Modal Footer Buttons */
@@ -2766,6 +2847,33 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         transition: opacity ${config.behavior.modalAnimation.duration}s ${config.behavior.modalAnimation.easing};
     }
 
+    /* Blur overlay for restricting interaction */
+    .cookie-blur-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        z-index: 9998;
+        display: none;
+        pointer-events: none; /* Allows clicks to pass through to banner */
+    }
+    
+  
+       /* When restricting clicks, make overlay block clicks */
+    .cookie-blur-overlay.block-clicks {
+        pointer-events: auto;
+        cursor: default;  <-- CHANGED TO "default"
+    }
+    
+    /* When preventing scroll */
+    .no-scroll {
+        overflow: hidden !important;
+    }
+
+    
     .cookie-settings-modal.show {
         display: flex;
         align-items: center;
@@ -2827,6 +2935,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         background-color: ${config.modalStyle.body.background};
         overflow-y: auto;
         flex: 1;
+        color: black;
     }
 
     .cookie-category {
@@ -2929,7 +3038,6 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
     .cookie-details-container:hover {
         box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-        border-color: ${config.buttonStyle.accept.background};
     }
 
     .cookie-details-header {
@@ -3053,7 +3161,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     /* Floating Settings Button */
     .cookie-settings-button {
         position: fixed;
-        bottom: 96px;
+        bottom: 30px;
         ${config.behavior.floatingButtonPosition === 'left' ? 'left: 30px;' : 'right: 30px;'}
         width: ${config.floatingButtonStyle.size};
         height: ${config.floatingButtonStyle.size};
@@ -3076,12 +3184,6 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         transform: translateY(0);
     }
 
-    .cookie-settings-button:hover {
-        background-color: ${config.floatingButtonStyle.hover.background};
-        transform: ${config.floatingButtonStyle.hover.transform};
-        box-shadow: ${config.floatingButtonStyle.hover.boxShadow};
-    }
-
     #cookieFloatingButton.cookie-settings-button svg,
     #cookieFloatingButton.cookie-settings-button svg path {
         width: 40px;
@@ -3090,6 +3192,9 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         stroke: none;
         transition: transform 0.3s ease;
         margin-top: 0px; 
+    }
+    .cookie-settings-button:hover svg {
+        transform: rotate(15deg);
     }
 
     /* Admin Button */
@@ -3431,7 +3536,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         
         .cookie-btn {
             flex: 1;
-            min-width: 120px;
+            text-wrap: nowrap;
         }
         
         .cookie-btn:last-child {
@@ -3483,18 +3588,13 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         }
     }
 
-
-
-
-
-
 /* floating icon new setup ..................................................................................................................... */
 
 
 /* Mobile-specific floating button */
 @media (max-width: 767px) {
     #cookieFloatingButton.mobile-only {
-        bottom: 80px;
+        bottom: 20px;
         right: 20px;
        /* left: auto; */
     }
@@ -3680,6 +3780,9 @@ function initializeCookieConsent(detectedCookies, language) {
         }
     }
 
+
+
+    // Microsoft Clarity initialization
 // Microsoft Clarity initialization - UPDATED FOR COMPLIANCE
 function initializeClarity(consentGranted) {
     if (!config.clarityConfig.enabled) return;
@@ -3708,6 +3811,8 @@ function initializeClarity(consentGranted) {
         window.clarity('consent', false);
     }
 }
+
+
 
 // Function to send consent signal to Microsoft Clarity
 function sendClarityConsentSignal(consentGranted) {
@@ -3743,7 +3848,11 @@ function sendClarityConsentSignal(consentGranted) {
         });
     }
     
+    // Set up event listeners
     setupEventListeners();
+
+    // NEW: Setup banner triggers
+    setupBannerTriggers();
     
     // Setup cookie details toggles
     document.querySelectorAll('.cookie-details-header').forEach(header => {
@@ -3845,6 +3954,52 @@ function setupPasswordPromptEvents() {
     }
 }
 
+
+
+
+// NEW: Setup banner trigger functionality
+function setupBannerTriggers() {
+    if (!config.bannerTriggers.enabled) return;
+    
+    // Option 1: Trigger by text content
+    if (config.bannerTriggers.triggerText) {
+        const elements = Array.from(document.querySelectorAll('*')).filter(el => 
+            el.textContent.trim() === config.bannerTriggers.triggerText
+        );
+        elements.forEach(element => {
+            element.style.cursor = 'pointer';
+            element.addEventListener('click', function(e) {
+                e.preventDefault();
+                showCookieBanner();
+            });
+        });
+    }
+    
+    // Option 2: Trigger by CSS class
+    if (config.bannerTriggers.triggerClass) {
+        const elements = document.querySelectorAll('.' + config.bannerTriggers.triggerClass);
+        elements.forEach(element => {
+            element.style.cursor = 'pointer';
+            element.addEventListener('click', function(e) {
+                e.preventDefault();
+                showCookieBanner();
+            });
+        });
+    }
+    
+    // Option 3: Trigger by ID
+    if (config.bannerTriggers.triggerId) {
+        const element = document.getElementById(config.bannerTriggers.triggerId);
+        if (element) {
+            element.style.cursor = 'pointer';
+            element.addEventListener('click', function(e) {
+                e.preventDefault();
+                showCookieBanner();
+            });
+        }
+    }
+}
+
 // Setup all event listeners
 function setupEventListeners() {
     document.getElementById('acceptAllBtn').addEventListener('click', function() {
@@ -3914,22 +4069,17 @@ function setupEventListeners() {
 
 // Show/hide functions with animations
 function showCookieBanner() {
-
     const banner = document.getElementById('cookieConsentBanner');
-
-    if (!banner) {
-        console.warn('Banner not found.');
-        return;
-    }
-
     banner.style.display = 'block';
-
-    requestAnimationFrame(() => {
+    setTimeout(() => {
         banner.classList.add('show');
-    });
-
+    }, 10);
     bannerShown = true;
+    
+    // NEW: Enable interaction restrictions when banner shows
+    enableInteractionRestrictions();
 }
+
 
 function hideCookieBanner() {
     const banner = document.getElementById('cookieConsentBanner');
@@ -3938,6 +4088,9 @@ function hideCookieBanner() {
         banner.style.display = 'none';
     }, 400);
     bannerShown = false;
+    
+    // NEW: Disable interaction restrictions when banner hides
+    disableInteractionRestrictions();
 }
 
 function showCookieSettings() {
@@ -4001,6 +4154,101 @@ function hideFloatingButton() {
     }, 300);
 }
 
+// NEW: Enable/disable interaction restrictions
+function enableInteractionRestrictions() {
+    if (!config.behavior.restrictInteraction.enabled) return;
+    
+    const overlay = document.getElementById('cookieBlurOverlay');
+    
+    // Apply blur effect
+    if (config.behavior.restrictInteraction.blurBackground) {
+        overlay.style.backdropFilter = `blur(${config.behavior.restrictInteraction.blurDensity})`;
+        overlay.style.webkitBackdropFilter = `blur(${config.behavior.restrictInteraction.blurDensity})`;
+        overlay.style.display = 'block';
+    }
+    
+    // Prevent scrolling
+    if (config.behavior.restrictInteraction.preventScroll) {
+        document.body.classList.add('no-scroll');
+    }
+    
+    // Prevent clicking outside banner
+    if (config.behavior.restrictInteraction.preventClick) {
+        overlay.classList.add('block-clicks');
+        
+        // Only allow clicks on the banner
+        overlay.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }, true);
+    }
+}
+
+// NEW: Disable interaction restrictions
+function disableInteractionRestrictions() {
+    const overlay = document.getElementById('cookieBlurOverlay');
+    
+    // Remove blur effect
+    overlay.style.display = 'none';
+    
+    // Enable scrolling
+    document.body.classList.remove('no-scroll');
+    
+    // Enable clicking
+    overlay.classList.remove('block-clicks');
+    
+    // Remove click blocker
+    overlay.removeEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }, true);
+}
+
+// NEW: Toggle functions for manual control
+function toggleRestrictions(enable) {
+    if (enable) {
+        enableInteractionRestrictions();
+    } else {
+        disableInteractionRestrictions();
+    }
+}
+
+function toggleScrollRestriction(enable) {
+    config.behavior.restrictInteraction.preventScroll = enable;
+    if (enable) {
+        document.body.classList.add('no-scroll');
+    } else {
+        document.body.classList.remove('no-scroll');
+    }
+}
+
+function toggleClickRestriction(enable) {
+    config.behavior.restrictInteraction.preventClick = enable;
+    const overlay = document.getElementById('cookieBlurOverlay');
+    if (enable) {
+        overlay.classList.add('block-clicks');
+    } else {
+        overlay.classList.remove('block-clicks');
+    }
+}
+
+function toggleBlurEffect(enable) {
+    config.behavior.restrictInteraction.blurBackground = enable;
+    const overlay = document.getElementById('cookieBlurOverlay');
+    overlay.style.display = enable ? 'block' : 'none';
+}
+
+function setBlurDensity(density) {
+    config.behavior.restrictInteraction.blurDensity = density;
+    const overlay = document.getElementById('cookieBlurOverlay');
+    overlay.style.backdropFilter = `blur(${density})`;
+    overlay.style.webkitBackdropFilter = `blur(${density})`;
+}
+
+
+
+
+
 // Cookie consent functions
 function acceptAllCookies() {
 
@@ -4046,6 +4294,9 @@ function acceptAllCookies() {
         },
         'gcs': 'G111'
     });
+
+     // NEW: Disable interaction restrictions when user accepts
+    disableInteractionRestrictions();
 }
 
 function rejectAllCookies() {
@@ -4056,7 +4307,7 @@ function rejectAllCookies() {
     
     const consentData = {
         status: 'rejected',
-        gcs: 'G100',
+        gcs: 'G100', // Explicit GCS signal for all denied
         categories: {
             functional: false,
             analytics: false,
@@ -4089,6 +4340,10 @@ function rejectAllCookies() {
         },
         'gcs': 'G100'
     });
+
+     // NEW: Disable interaction restrictions when user accepts
+    disableInteractionRestrictions();
+   
 }
 
 function saveCustomSettings() {
@@ -4176,7 +4431,12 @@ function saveCustomSettings() {
             'gcs': gcsSignal
         });
     }
+
+     // NEW: Disable interaction restrictions when user accepts
+    disableInteractionRestrictions();
+   
 }
+
 // Helper functions
 function clearNonEssentialCookies() {
     const cookies = document.cookie.split(';');
@@ -4197,6 +4457,9 @@ function clearNonEssentialCookies() {
         }
     });
 }
+
+
+
 
 // Check if current URL matches any of the specified patterns
 function shouldShowOnCurrentUrl() {
@@ -4272,6 +4535,7 @@ function ensureClarityConsentSignal(consentGranted) {
         };
         window.clarity('consent', consentGranted);
     }
+    
 }
 
 function clearCategoryCookies(category) {
@@ -4348,12 +4612,14 @@ function sendClarityConsentSignal(consentGranted) {
         window.dataLayer.push({
             'event': 'clarity_consent_signal',
             'clarity_consent': consentGranted,
-            'clarity_region': locationData?.country || 'unknown'
+            'clarity_region': locationData?.country || 'unknown',
+            'timestamp': new Date().toISOString()
         });
     } catch (error) {
         console.error('Failed to send Clarity consent signal:', error);
     }
 }
+
 
 // Update consent mode for both Google and Microsoft UET
 function updateConsentMode(consentData) {
@@ -4406,7 +4672,8 @@ function updateConsentMode(consentData) {
                 'src': 'update',
                 'asc': uetConsentState === 'granted' ? 'G' : 'D',
                 'timestamp': new Date().toISOString()
-            }
+            },
+            'location_data': locationData
         });
     }
     
@@ -4424,7 +4691,8 @@ function updateConsentMode(consentData) {
         'event': 'cookie_consent_update',
         'consent_mode': consentStates,
         'gcs': gcsSignal,
-        'consent_status': consentData.status
+        'consent_status': consentData.status,
+        'consent_categories': consentData.categories
     });
 }
 
@@ -4459,12 +4727,12 @@ function sanitizeParamValue(value) {
 
 // Load analytics cookies function
 function loadAdvertisingCookies() {
-    
+
 }
 
 // Load performance cookies function
 function loadPerformanceCookies() {
-  
+    
 }
 
 // Main execution flow
@@ -4478,7 +4746,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Push cached data to dataLayer
             pushGeoDataToDataLayer(locationData);
         }
-
+        
     } catch (e) {
         console.error('Failed to load location data:', e);
     }
@@ -4490,6 +4758,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Store query parameters on page load
     storeQueryParams();
    
+
     // Check existing consent on page load and apply to Clarity
     const existingConsent = getClarityConsentState();
     if (existingConsent !== null) {
@@ -4506,6 +4775,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Fetch location data asynchronously
     await fetchLocationData();
+    
+      // Check geo-targeting before proceeding
+    const geoAllowed = checkGeoTargeting(locationData);
+    if (!geoAllowed) {
+        return;
+    }
 
     // Scan and categorize existing cookies
     const detectedCookies = scanAndCategorizeCookies();
@@ -4519,40 +4794,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Initialize cookie consent
     initializeCookieConsent(detectedCookies, userLanguage);
 
-    // Handle scroll acceptance if enabled
-    if (config.behavior.acceptOnScroll) {
-        let scrollTimeout;
-        window.addEventListener('scroll', function() {
-            if (!getCookie('cookie_consent') && bannerShown) {
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(function() {
-                    const scrollPercentage = (window.scrollY + window.innerHeight) / document.body.scrollHeight * 100;
-                    if (scrollPercentage > 30) {
-                        acceptAllCookies();
-                        hideCookieBanner();
-                        if (config.behavior.showFloatingButton) {
-                            showFloatingButton();
-                        }
-                    }
-                }, 200);
-            }
-        });
-    }
 
-    // Handle continue button acceptance if enabled
-    if (config.behavior.acceptOnContinue) {
-        document.addEventListener('click', function(e) {
-            if (!getCookie('cookie_consent') && bannerShown && 
-                !e.target.closest('#cookieConsentBanner') && 
-                !e.target.closest('#cookieSettingsModal')) {
-                acceptAllCookies();
-                hideCookieBanner();
-                if (config.behavior.showFloatingButton) {
-                    showFloatingButton();
-                }
-            }
-        });
-    }
 });
 
 // Add this function to check consent on each page load
@@ -4581,6 +4823,12 @@ if (typeof window !== 'undefined') {
         saveSettings: saveCustomSettings,
         changeLanguage: changeLanguage,
         showAnalytics: showAnalyticsDashboard,
-        config: config
+        config: config,
+        // NEW: Control functions for restrictions
+        toggleRestrictions: toggleRestrictions,
+        toggleScrollRestriction: toggleScrollRestriction,
+        toggleClickRestriction: toggleClickRestriction,
+        toggleBlurEffect: toggleBlurEffect,
+        setBlurDensity: setBlurDensity
     };
 }
